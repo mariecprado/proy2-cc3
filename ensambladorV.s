@@ -20,7 +20,9 @@ LSRV: .asciz "LSRV"
 ASRV: .asciz "ASRV"
 RORV: .asciz "RORV"
 
+///////////////////////////////
 
+ADDI: .asciz "ADDI"
 
 READ_MODE: .asciz "r"
 WORD: .space 100
@@ -213,22 +215,28 @@ ands_case:
 lslv_case:
    MOV w0,#0x9AC
    LSL w0, w0, #20
-   B code_r_instruction
+   B code_lslv
 
-lsrl_case:
+lsrv_case:
    MOV w0,#0x9AC
    LSL w0, w0, #20
-   B code_r_instruction
+   B code_lsrv
 
 asrv_case:
    MOV w0,#0x9AC
    LSL w0, w0, #20
-   B code_r_instruction
+   B code_asrv
 
-rovr_case:
+
+rorv_case:
    MOV w0,#0x9AC
    LSL w0, w0, #20
-   B code_r_instruction
+   B code_rorv
+
+addi_case:
+   MOV w0,#0x910
+   LSL w0, w0, #20
+   B code_i_instruction
 
 encode:
    SUB SP, SP, #48
@@ -301,10 +309,10 @@ loop:
    B.EQ lslv_case
 
    LDR x0,=WORD
-   LDR x1,=LSRL
+   LDR x1,=LSRV
    BL strcmp
    CMP x0,#0
-   B.EQ lsrl_case
+   B.EQ lsrv_case
 
    LDR x0,=WORD
    LDR x1,=ASRV
@@ -313,10 +321,16 @@ loop:
    B.EQ asrv_case
 
    LDR x0,=WORD
-   LDR x1,=ROVR
+   LDR x1,=RORV
    BL strcmp
    CMP x0,#0
-   B.EQ rovr_case
+   B.EQ rorv_case
+
+   LDR x0,=WORD
+   LDR x1,=ADDI
+   BL strcmp
+   CMP x0,#0
+   B.EQ addi_case
 
    B finish_encode
 
@@ -355,6 +369,214 @@ code_r_instruction:
    STR w22, [x20,#0]
    ADD x20, x20, #4
    b loop
+
+code_asrv:
+   MOV w22,w0
+
+
+   MOV x0, x19 
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0  
+   LDR x0,=WORD
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+
+   BL atoi
+   LSL w0,w0,#16
+   ORR w22, w22, w0
+
+   MOV x0, #0b001010
+   LSL x0, x0, #10
+   ORR x22, x22, x0 
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+
+code_rorv:
+    MOV w22,w0
+
+   MOV x0, x19 
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0  
+   LDR x0,=WORD
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+
+   BL atoi
+   LSL x0,x0,#16
+   ORR x22, x22, x0
+   	
+   MOV x0, #0b001011
+   LSL x0, x0, #10
+   ORR x22, x22, x0 
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+
+code_lsrv:
+   MOV w22,w0
+   MOV x0, x19 
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0  
+   LDR x0,=WORD
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+
+   BL atoi
+   LSL w0,w0,#16
+   ORR w22, w22, w0
+
+   MOV x0, #0b001001
+   LSL x0, x0, #10
+   ORR x22, x22, x0 
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+code_lslv:
+   MOV w22,w0
+   MOV x0, x19 
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0  
+   LDR x0,=WORD
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+
+   BL atoi
+   LSL w0,w0,#16
+   ORR w22, w22, w0
+
+   MOV x0, #0b001000
+   LSL x0, x0, #10
+   ORR x22, x22, x0 
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+code_i_instruction:
+   MOV w22,w0
+
+   MOV x0, x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+   BL atoi
+   CMP x0, #0
+   B.LT negative
+   LSL w0,w0,#10
+   ORR w22, w22, w0
+   
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+negative:
+   SUB x0, x0, #1
+   NEG x0, x0
+   RET
    
 finish_encode:
    LDR x19,[SP,#0x0]
@@ -409,4 +631,6 @@ args_error:
    LDR x0,=args_error_msg
    BL puts
    B main_finish
+
+
 
