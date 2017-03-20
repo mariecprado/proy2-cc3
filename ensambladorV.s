@@ -5,6 +5,8 @@
 ////////////////////////////////////////////////////////////////////////////////////
 
 .data
+
+XZR: .asciz "XZR"
 ADD_: .asciz "ADD"
 SUB_: .asciz "SUB"
 ADDS_: .asciz "ADDS"
@@ -23,7 +25,15 @@ RORV: .asciz "RORV"
 ///////////////////////////////
 
 ADDI: .asciz "ADDI"
+SUBI: .asciz "SUBI"
+ADDSI: .asciz "ADDSI"
+SUBSI: .asciz "SUBSI"
 
+MOVN: .asciz "MOVN"
+MOV: .asciz "MOV"
+MOVK: .asciz "MOVK"
+
+NUM: .asciz "#31"
 READ_MODE: .asciz "r"
 WORD: .space 100
 CHAR: .asciz "%c\n"
@@ -37,6 +47,7 @@ dot_text: .space 4000	//el area de texto
 file_buffer: .space 8000//el buffer que guardara el texto a codificar
 .text
   .globl main
+
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -198,7 +209,7 @@ and_case:
    B code_r_instruction
 
 orr_case:
-	MOV w0,#0xAA0
+   MOV w0,#0xAA0
    LSL w0, w0, #20
    B code_r_instruction
 
@@ -238,6 +249,36 @@ addi_case:
    LSL w0, w0, #20
    B code_i_instruction
 
+subi_case:
+   MOV w0,#0xD10
+   LSL w0, w0, #20
+   B code_i_instruction
+
+addsi_case:
+   MOV w0,#0xB10
+   LSL w0, w0, #20
+   B code_i_instruction
+
+subsi_case:
+   MOV w0,#0xF10
+   LSL w0, w0, #20
+   B code_i_instruction
+
+movn_case: 
+   MOV w0,#0x928
+   LSL w0, w0, #20
+   B code_mov
+
+mov_case:
+   MOV w0,#0xD28
+   LSL w0, w0, #20
+   B code_mov
+
+movk_case:
+   MOV w0,#0xF28
+   LSL w0, w0, #20
+   B code_mov
+
 encode:
    SUB SP, SP, #48
    STR x19,[SP,#0]
@@ -254,6 +295,7 @@ loop:
    LDR x1,=WORD		//PARAMETRO 2 (ESPACIO DONDE GUARADARE LA PALABRA)
    BL get_word
    MOV x19,x0		//DESECHANDO LO QUE YA LEI DEL BUFFER
+
    LDR x0,=WORD
    LDR x1,=ADD_
    BL strcmp
@@ -331,11 +373,47 @@ loop:
    BL strcmp
    CMP x0,#0
    B.EQ addi_case
+  
+   LDR x0,=WORD
+   LDR x1,=SUBI
+   BL strcmp
+   CMP x0,#0
+   B.EQ subi_case
+
+   LDR x0,=WORD
+   LDR x1,=ADDSI
+   BL strcmp
+   CMP x0,#0
+   B.EQ addsi_case
+
+   LDR x0,=WORD
+   LDR x1,=SUBSI
+   BL strcmp
+   CMP x0,#0
+   B.EQ subsi_case
+
+   LDR x0,=WORD
+   LDR x1,=MOVN
+   BL strcmp
+   CMP x0,#0
+   B.EQ movn_case
+  
+   LDR x0,=WORD
+   LDR x1,=MOV
+   BL strcmp
+   CMP x0,#0
+   B.EQ mov_case
+
+   LDR x0,=WORD
+   LDR x1,=MOVK
+   BL strcmp
+   CMP x0,#0
+   B.EQ movk_case
 
    B finish_encode
 
 code_r_instruction:
-   MOV w22,w0
+    MOV w22,w0
 
    MOV x0, x19
    LDR x1,=WORD
@@ -369,7 +447,7 @@ code_r_instruction:
    STR w22, [x20,#0]
    ADD x20, x20, #4
    b loop
-
+   
 code_asrv:
    MOV w22,w0
 
@@ -453,7 +531,6 @@ code_rorv:
    STR w22, [x20,#0]
    ADD x20, x20, #4
    b loop
-
 
 code_lsrv:
    MOV w22,w0
@@ -573,6 +650,33 @@ code_i_instruction:
    ADD x20, x20, #4
    b loop
 
+code_mov:
+   MOV w22,w0
+
+   MOV x0, x19 
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0  
+   LDR x0,=WORD
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+
 negative:
    SUB x0, x0, #1
    NEG x0, x0
@@ -631,6 +735,9 @@ args_error:
    LDR x0,=args_error_msg
    BL puts
    B main_finish
+
+
+
 
 
 
