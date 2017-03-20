@@ -33,6 +33,11 @@ MOVN: .asciz "MOVN"
 MOV: .asciz "MOV"
 MOVK: .asciz "MOVK"
 
+STRB: .asciz "STRB"
+LDRB: .asciz "LDRB"
+STR: .asciz "STR"
+LDR: .asciz "LDR"
+
 NUM: .asciz "#31"
 READ_MODE: .asciz "r"
 WORD: .space 100
@@ -152,6 +157,10 @@ ignore_char:
    B.EQ ignore_char_loop
    CMP w9,','	//COMPARANDO CON COMA
    B.EQ ignore_char_loop
+      CMP w9,'['	//COMPARANDO CORCHETE
+    B.EQ ignore_char_loop
+    CMP w9,']'	//COMPARANDO CORCHETE
+    B.EQ ignore_char_loop
    CMP w9,#0	//COMPARANDO CON NULL
    B.EQ finish_get_word
    B get_word_loop
@@ -166,6 +175,10 @@ get_word_loop:
    CMP w9,','
    B.EQ finish_get_word
    CMP w9,'\n'
+   B.EQ finish_get_word
+   CMP w9,'['
+   B.EQ finish_get_word
+   CMP w9,']'	
    B.EQ finish_get_word
    CMP w9,#0
    B.EQ finish_get_word
@@ -278,6 +291,26 @@ movk_case:
    MOV w0,#0xF28
    LSL w0, w0, #20
    B code_mov
+
+strb_case:
+   MOV w0, #0x390
+   LSL w0, w0, #20
+   B code_lstr
+
+ldrb_case:
+   MOV w0, #0x394
+   LSL w0, w0, #20
+   B code_lstr 
+
+ldr_case:
+   MOV w0, #0xF94
+   LSL w0, w0, #20
+   B code_lstr 
+
+str_case:
+   MOV w0, #0xF90
+   LSL w0, w0, #20
+   B code_lstr 
 
 encode:
    SUB SP, SP, #48
@@ -409,6 +442,30 @@ loop:
    BL strcmp
    CMP x0,#0
    B.EQ movk_case
+ 
+   LDR x0,=WORD
+   LDR x1,=STRB
+   BL strcmp
+   CMP x0,#0
+   B.EQ strb_case
+  
+   LDR x0,=WORD
+   LDR x1,=LDRB
+   BL strcmp
+   CMP x0,#0
+   B.EQ ldrb_case
+
+   LDR x0,=WORD
+   LDR x1,=STR
+   BL strcmp
+   CMP x0,#0
+   B.EQ str_case
+
+   LDR x0,=WORD
+   LDR x1,=LDR
+   BL strcmp
+   CMP x0,#0
+   B.EQ ldr_case
 
    B finish_encode
 
@@ -676,6 +733,43 @@ code_mov:
    ADD x20, x20, #4
    b loop
 
+code_lstr:
+   MOV w22,w0
+
+   MOV x0, x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+   ADD x0,x0,#1
+   BL atoi
+   CMP x0, #0
+   B.LT negative
+   LSL w0,w0,#10
+   ORR w22, w22, w0
+   
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
 
 negative:
    SUB x0, x0, #1
