@@ -197,8 +197,23 @@ finish_get_word:
    RET
 
 si_es:
-   LDR x0,=NUM
-   RET
+   MOV x24, x0
+   MOV x0, #31
+   LSL x0, x0, #5
+   ORR x24, x24, x0
+   MOV x0,x24
+   MOV x0, x19
+   BL println
+   B ultima 
+
+/*si_es_u:
+   MOV x24, x0
+   MOV x0, #31
+   LSL x0, x0, #5
+   ORR x24, x24, x0
+   MOV x0,x24
+   B loop
+*/
 
 add_o_addi:
 
