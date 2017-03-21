@@ -6,7 +6,7 @@
 
 .data
 
-XZR: .asciz "XZR"
+XZR: .asciz "xzr"
 ADD_: .asciz "ADD"
 SUB_: .asciz "SUB"
 ADDS_: .asciz "ADDS"
@@ -209,10 +209,10 @@ add_o_addi:
    BL get_word
    MOV x19,x0
    LDR x0,=WORD
-//   LDR x1, =XZR
-//   BL strcmp
-//   CMP x0,#0
-//   B.EQ si_es
+   LDR x1, =XZR
+   BL strcmp
+   CMP x0,#0
+   B.EQ si_es
    ADD x0,x0, #1
    BL atoi
    ORR w22, w22, w0
@@ -222,10 +222,10 @@ add_o_addi:
    BL get_word
    MOV x19, x0
    LDR x0,=WORD
-//   LDR x1, =XZR
-//   BL strcmp
-//   CMP x0,#0
-//   B.EQ si_es
+   LDR x1, =XZR
+   BL strcmp
+   CMP x0,#0
+   B.EQ si_es
    ADD x0,x0,#1
    BL atoi
    LSL w0, w0, #5
@@ -236,10 +236,10 @@ add_o_addi:
    BL get_word
    MOV x19,x0
    LDR x0,=WORD
-//   LDR x1, =XZR
-//   BL strcmp
-//   CMP x0,#0
-//   B.EQ si_es
+   LDR x1, =XZR
+   BL strcmp
+   CMP x0,#0
+   B.EQ si_es
    LDRB w9,[x0,#0]
    CMP w9,'#'
    B.EQ addi_case
