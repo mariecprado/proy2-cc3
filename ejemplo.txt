@@ -1,2 +1,4 @@
-ADD x0, x1, x2
+ADD x0, x1, #25
+SUB x0, x1, #25
+SUB x0, x1, x25
 ORR x2, x12, x25
