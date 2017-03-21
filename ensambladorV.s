@@ -193,28 +193,246 @@ finish_get_word:
    LDR x19, [SP,#8]
    LDR x20,[SP,#16]
    ADD SP, SP, #32
+
    RET
+add_o_addi:
+
+   MOV w22,w0
+
+   MOV x0, x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   LDRB w9,[x0,#0]
+   CMP w9,'#'
+   B.EQ addi_case
+   B add_case
+
+
+adds_o_addsi:
+
+   MOV w22,w0
+
+   MOV x0, x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   LDRB w9,[x0,#0]
+   CMP w9,'#'
+   B.EQ addsi_case
+   B adds_case
+
+
+sub_o_subi:
+
+   MOV w22,w0
+
+   MOV x0, x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   LDRB w9,[x0,#0]
+   CMP w9,'#'
+   B.EQ subi_case
+   B sub_case
+
+subs_o_subsi:
+
+   MOV w22,w0
+
+   MOV x0, x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   ADD x0,x0, #1
+   BL atoi
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19, x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0, w0, #5
+   ORR w22, w22, w0
+
+   MOV x0,x19
+   LDR x1,=WORD
+   BL get_word
+   MOV x19,x0
+   LDR x0,=WORD
+//   LDR x1, =XZR
+//   BL strcmp
+//   CMP x0,#0
+//   B.EQ si_es
+   LDRB w9,[x0,#0]
+   CMP w9,'#'
+   B.EQ subsi_case
+   B subs_case
 
 
 add_case:
-   MOV w0,#0x8B0
-   LSL w0, w0, #20
-   B code_r_instruction
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0,w0,#16
+   ORR w22, w22, w0
 
-sub_case:
-   MOV w0, #0xCB0
+   MOV w0,#0x910
    LSL w0, w0, #20
-   B code_r_instruction
+   ORR w22, w22, w0
 
-adds_case:
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+sub_case: //0xCB0
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0,w0,#16
+   ORR w22, w22, w0
+
+   MOV w0,#0xCB0
+   LSL w0, w0, #20
+   ORR w22, w22, w0
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+adds_case: //0xAB0
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0,w0,#16
+   ORR w22, w22, w0
+
    MOV w0,#0xAB0
    LSL w0, w0, #20
-   B code_r_instruction
+   ORR w22, w22, w0
 
-subs_case:
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+subs_case: //0xEB0
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0,w0,#16
+   ORR w22, w22, w0
+
    MOV w0,#0xEB0
    LSL w0, w0, #20
-   B code_r_instruction
+   ORR w22, w22, w0
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
 
 and_case:
    MOV w0,#0x8A0
@@ -258,24 +476,60 @@ rorv_case:
    B code_rorv
 
 addi_case:
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0,w0,#10
+   ORR w22, w22, w0
+
    MOV w0,#0x910
    LSL w0, w0, #20
-   B code_i_instruction
+   ORR w22, w22, w0
 
-subi_case:
-   MOV w0,#0xD10
-   LSL w0, w0, #20
-   B code_i_instruction
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
 
 addsi_case:
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0,w0,#10
+   ORR w22, w22, w0
+
    MOV w0,#0xB10
    LSL w0, w0, #20
-   B code_i_instruction
+   ORR w22, w22, w0
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
+
+subi_case:
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0,w0,#10
+   ORR w22, w22, w0
+
+   MOV w0,#0xD10
+   LSL w0, w0, #20
+   ORR w22, w22, w0
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
 
 subsi_case:
+   ADD x0,x0,#1
+   BL atoi
+   LSL w0,w0,#10
+   ORR w22, w22, w0
+
    MOV w0,#0xF10
    LSL w0, w0, #20
-   B code_i_instruction
+   ORR w22, w22, w0
+
+   STR w22, [x20,#0]
+   ADD x20, x20, #4
+   b loop
 
 movn_case: 
    MOV w0,#0x928
@@ -333,25 +587,25 @@ loop:
    LDR x1,=ADD_
    BL strcmp
    CMP x0,#0
-   B.EQ add_case
+   B.EQ add_o_addi
 
    LDR x0,=WORD
    LDR x1,=SUB_
    BL strcmp
    CMP x0,#0
-   B.EQ sub_case
+   B.EQ sub_o_subi
 
    LDR x0,=WORD
    LDR x1,=ADDS_
    BL strcmp
    CMP x0,#0
-   B.EQ adds_case
+   B.EQ adds_o_addsi
 
    LDR x0,=WORD
    LDR x1,=SUBS_
    BL strcmp
    CMP x0,#0
-   B.EQ subs_case
+   B.EQ subs_o_subsi
 
    LDR x0,=WORD
    LDR x1,=AND
